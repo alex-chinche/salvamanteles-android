@@ -11,6 +11,6 @@ import retrofit2.http.POST;
 public interface apiInterface {
         @FormUrlEncoded
         @POST("createUser")
-        Call<String> register(@Field("name") String name, @Field("email") String email, @Field("password") String password);
+        Call<Token> register(@Field("name") String name, @Field("email") String email, @Field("password") String password);
     }
 

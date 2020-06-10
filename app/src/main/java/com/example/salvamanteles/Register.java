@@ -3,16 +3,29 @@ package com.example.salvamanteles;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class Register extends AppCompatActivity {
     EditText nameField;
@@ -45,6 +58,7 @@ public class Register extends AppCompatActivity {
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.0.26/salvamanteles/public/index.php/api/") // URL del servidor (API)
                 .addConverterFactory(GsonConverterFactory.create()) // Conversor de JSON
+                .addConverterFactory(ScalarsConverterFactory.create()) //Conversor de escalares
                 .build();
         apiInterface = retrofit.create(apiInterface.class);
 
@@ -61,27 +75,32 @@ public class Register extends AppCompatActivity {
         String name = nameField.getText().toString();
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();
-        Call<String> llamada = apiInterface.register(name, email, password);
-        llamada.enqueue(new Callback<String>() {
+        Call<Token> llamada = apiInterface.register(name, email, password);
+        Log.d("registro", name + email + password);
+        llamada.enqueue(new Callback<Token>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.code() == 200) {
-                    //ESTO DEBERIA EJECUTARSE CUANDO VA TOODO CORRECTO, YA QUE DESDE LA API LLEGA UN CODIGO 200 CON EL TOKEN, SIN EMBARGO, NUNCA LLEGO A ESTE PUNTO DEL CODIGO
+            public void onResponse(Call<Token> call, Response<Token> response) {
+                if (response.code() == 201) {
                     Toast.makeText(Register.this, "User created", Toast.LENGTH_SHORT).show();
+                    String token = response.body().token;
                     //GUARDAR TOKEN DE LA RESPONSE AQUI (POR HACER)
                 }
-                else {
-                    //ESTO SE EJECUTA CORRECTAMENTE CUANDO HAY ALGUN ERROR UNA VEZ ACCEDIDO AL SERVER
-                    //EN ESTE PUNTO LA RESPONSE VIENE COMO: 'message' = "el mensaje que corresponda", SIN EMBARGO, CON response.body()
-                    //NO LOGRO ACCEDER AL CUERPO DEL 'message', SINO QUE EL SIGUIENTE TOAST APARECE NULO SIEMPRE
-                    Toast.makeText(Register.this, response.body(), Toast.LENGTH_SHORT).show();
+                if (response.code() == 400) {
+                        try {
+                            JSONObject jObjError = new JSONObject(response.errorBody().string());
+                            Toast.makeText(Register.this, jObjError.getString("message"), Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(Register.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
-            }
+
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<Token> call, Throwable t) {
                 //ESTO DEBERIA EJECUTARSE CUANDO NO HAY CONEXION CON EL SERVIDOR, SIN EMBARGO, SE EJECUTA CUANDO SE REGISTRA EL USUARIO QUE ESTÁ CLARO QUE HAY CONEXION
                 Toast.makeText(Register.this, "Problema de conexión", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 }
