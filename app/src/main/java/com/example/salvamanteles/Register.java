@@ -2,22 +2,20 @@ package com.example.salvamanteles;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,13 +26,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class Register extends AppCompatActivity {
-    EditText nameField;
-    EditText emailField;
-    EditText passwordField;
-    Button registerButton;
-    Button goToLoginButton;
+    EditText nameField, emailField, passwordField;
+    Button registerButton, goToLoginButton;
     Retrofit retrofit;
     apiInterface apiInterface;
+    String tokenGot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +41,8 @@ public class Register extends AppCompatActivity {
         passwordField = findViewById(R.id.passwordField);
         registerButton = findViewById(R.id.createUser);
         goToLoginButton = findViewById(R.id.goToLogin);
+
+        loadTokenPreferences();
 
         goToLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,8 +80,10 @@ public class Register extends AppCompatActivity {
             public void onResponse(Call<Token> call, Response<Token> response) {
                 if (response.code() == 201) {
                     Toast.makeText(Register.this, "User created", Toast.LENGTH_SHORT).show();
-                    String token = response.body().token;
-                    //GUARDAR TOKEN DE LA RESPONSE AQUI (POR HACER)
+                    tokenGot = response.body().token;
+                    Log.d("tokencito", tokenGot);
+                    //Guardamos token de la response
+                    saveTokenPreferences();
                 }
                 if (response.code() == 400) {
                         try {
@@ -97,10 +97,21 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
-                //ESTO DEBERIA EJECUTARSE CUANDO NO HAY CONEXION CON EL SERVIDOR, SIN EMBARGO, SE EJECUTA CUANDO SE REGISTRA EL USUARIO QUE ESTÁ CLARO QUE HAY CONEXION
                 Toast.makeText(Register.this, "Problema de conexión", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    private void saveTokenPreferences() {
+        SharedPreferences saveToken = getSharedPreferences("credenciales", MODE_PRIVATE);
+        SharedPreferences.Editor editor = saveToken.edit();
+        editor.putString("savedToken", tokenGot);
+        editor.apply();
+    }
+
+    private void loadTokenPreferences() {
+        SharedPreferences saveToken = getSharedPreferences("credenciales", MODE_PRIVATE);
+        String getTokenFromSharedPref = saveToken.getString("savedToken", "No info");
+        Log.d("SharedToken", getTokenFromSharedPref);
     }
 }
