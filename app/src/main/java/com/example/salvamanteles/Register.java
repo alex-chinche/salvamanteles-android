@@ -30,6 +30,7 @@ public class Register extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("Situacion", "Estamos en pantalla registro");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
         nameField = findViewById(R.id.nameField);
@@ -51,12 +52,12 @@ public class Register extends AppCompatActivity {
         });
 
         // Inicializar Retrofit
-        retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.0.26/salvamanteles/public/index.php/api/") // URL del servidor (API)
-                .addConverterFactory(GsonConverterFactory.create()) // Conversor de JSON
-                .addConverterFactory(ScalarsConverterFactory.create()) //Conversor de escalares
-                .build();
-        apiInterface = retrofit.create(apiInterface.class);
+            retrofit = new Retrofit.Builder()
+                    .baseUrl("http://192.168.0.26/salvamanteles/public/index.php/api/") // URL del servidor (API)
+                    .addConverterFactory(GsonConverterFactory.create()) // Conversor de JSON
+                    .addConverterFactory(ScalarsConverterFactory.create()) //Conversor de escalares
+                    .build();
+            apiInterface = retrofit.create(apiInterface.class);
 
         //Al pulsar el botón de registrarse hace el registro de usuario
         registerButton.setOnClickListener(new View.OnClickListener() {

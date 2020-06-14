@@ -1,11 +1,7 @@
 package com.example.salvamanteles;
 
-import android.app.Application;
-import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class SharedPreferencesClass {
