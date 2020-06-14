@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ProfilePreferences"></activity>
+        <activity android:name=".ProfileList"></activity>
+        <activity android:name=".AllergensChoice" />
+        <activity android:name=".ProfilePreferences" />
         <activity android:name=".Login" />
         <activity android:name=".Register">
             <intent-filter>

@@ -1,10 +1,8 @@
 package com.example.salvamanteles;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,7 +28,6 @@ public class Register extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("Situacion", "Estamos en pantalla registro");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
         nameField = findViewById(R.id.nameField);
@@ -38,10 +35,8 @@ public class Register extends AppCompatActivity {
         passwordField = findViewById(R.id.passwordField);
         registerButton = findViewById(R.id.createUser);
         goToLoginButton = findViewById(R.id.goToLogin);
-
         //Carga el token al iniciar la activity
         getTokenInRegister.loadTokenPreferences(context);
-
         //Cambia a pantalla de login
         goToLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +45,6 @@ public class Register extends AppCompatActivity {
                 startActivityForResult(intent, 0);
             }
         });
-
         // Inicializar Retrofit
             retrofit = new Retrofit.Builder()
                     .baseUrl("http://192.168.0.26/salvamanteles/public/index.php/api/") // URL del servidor (API)
@@ -58,7 +52,6 @@ public class Register extends AppCompatActivity {
                     .addConverterFactory(ScalarsConverterFactory.create()) //Conversor de escalares
                     .build();
             apiInterface = retrofit.create(apiInterface.class);
-
         //Al pulsar el botón de registrarse hace el registro de usuario
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +76,9 @@ public class Register extends AppCompatActivity {
                     Log.d("tokencito", tokenGot);
                     //Guardamos token de la response
                     getTokenInRegister.saveTokenPreferences(tokenGot, context);
+                    //Pasamos a pantalla de perfiles
+                    Intent toProfileList = new Intent(getApplicationContext(), ProfileList.class);
+                    startActivity(toProfileList);
                 }
                 if (response.code() == 400) {
                         try {
